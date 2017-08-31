@@ -4,15 +4,17 @@
 #include <vector>
 #include <string>
 #include <Eigen/Core>
+#include <visualization_msgs/Marker.h>
 
-class intensity_map
+class IntensityMapHandler
 {
 public:
-    intensity_map(size_t markers_size);
-    intensity_map();
-    ~intensity_map();
+    IntensityMapHandler(size_t markers_size);
+    IntensityMapHandler();
+    ~IntensityMapHandler();
     bool load_map(const std::string &file_path, std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count);
     bool save_map(const std::string &file_path, const std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count);
+    bool save_map(const std::string &file_path, const visualization_msgs::Marker &map_markers);
     bool getMarkers(std::vector<Eigen::Vector3f> &markers);
 private:
     std::vector<Eigen::Vector3f> map_markers;

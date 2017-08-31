@@ -1,9 +1,9 @@
-#include <intensity_map_lib/intensity_map_lib.h>
+#include <intensity_map_builder/intensity_map_handler.h>
 #include <boost/foreach.hpp>
 
 #define SCORE_TRESH 200
 
-intensity_map::intensity_map(size_t markers_size = 0)
+IntensityMapHandler::IntensityMapHandler(size_t markers_size = 0)
 {
 	std::vector<Eigen::Vector3f> map_markers;
 	map_markers.resize(markers_size);
@@ -16,15 +16,15 @@ intensity_map::intensity_map(size_t markers_size = 0)
 
 }
 
-intensity_map::intensity_map()
+IntensityMapHandler::IntensityMapHandler()
 {
-	intensity_map(0);
+	IntensityMapHandler(0);
 }
-intensity_map::~intensity_map()
+IntensityMapHandler::~IntensityMapHandler()
 {
 
 }
-bool intensity_map::load_map(const std::string &file_path, std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count)
+bool IntensityMapHandler::load_map(const std::string &file_path, std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count)
 {
 
 	boost::property_tree::read_xml(file_path, xml_tree);
@@ -38,7 +38,7 @@ bool intensity_map::load_map(const std::string &file_path, std::vector<Eigen::Ve
     }
     return true;
 }
-bool intensity_map::save_map(const std::string &file_path, const std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count)
+bool IntensityMapHandler::save_map(const std::string &file_path, const std::vector<Eigen::Vector3f> &map_markers, size_t &used_markers_count)
 {
     for (global_iterator = 0; global_iterator < used_markers_count; global_iterator++ )
     {
@@ -67,8 +67,36 @@ bool intensity_map::save_map(const std::string &file_path, const std::vector<Eig
 	
 	return true;
 }
+bool IntensityMapHandler::save_map(const std::string &file_path, const visualization_msgs::Marker &map_markers)
+{
+    for (global_iterator = 0; global_iterator < map_markers.points.size(); global_iterator++ )
+    {
+    	if (map_markers.points.at(global_iterator).z > SCORE_TRESH)
+    	{
+	        marker_path.str("");
+	        marker_path << "marker_" << global_iterator;
 
-bool intensity_map::getMarkers(std::vector<Eigen::Vector3f> &markers)
+	        //marker_tree = xml_tree.add_child(marker_path.str(), boost::property_tree::ptree{});
+	        marker_path.str("");
+	        marker_path << "map.marker_"<<global_iterator<<".x";
+	        save_xml_tree.put(marker_path.str(), map_markers.points.at(global_iterator).x);
+	        marker_path.str("");
+	        marker_path << "map.marker_"<<global_iterator<<".y";
+	        save_xml_tree.put(marker_path.str(), map_markers.points.at(global_iterator).y);
+	        marker_path.str("");
+	        marker_path << "map.marker_"<<global_iterator<<".score";
+	        save_xml_tree.put(marker_path.str(), map_markers.points.at(global_iterator).z);
+    	}
+
+    }
+
+    boost::property_tree::write_xml(file_path, save_xml_tree,
+        std::locale(),
+        boost::property_tree::xml_writer_make_settings<boost::property_tree::ptree::key_type>('\t', 1u)); 
+	
+	return true;
+}
+bool IntensityMapHandler::getMarkers(std::vector<Eigen::Vector3f> &markers)
 {
 	markers = map_markers;
 	return true;

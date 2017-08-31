@@ -22,16 +22,16 @@ catkin_package(
 		CATKIN_DEPENDS intensity_map_msgs
 		DEPENDS Boost
 		INCLUDE_DIRS include
-		LIBRARIES intensity_map_lib intensity_map_builder)
+		LIBRARIES intensity_map_handler intensity_map_builder)
 
-add_library(intensity_map_lib SHARED src/intensity_map_lib.cpp)
+add_library(intensity_map_handler SHARED src/intensity_map_handler.cpp)
 add_library(intensity_map_builder SHARED src/intensity_map_builder.cpp)
 
-target_link_libraries(intensity_map_lib ${catkin_LIBRARIES} ${BOOST_LIBRARIES} )
+target_link_libraries(intensity_map_handler ${catkin_LIBRARIES} ${BOOST_LIBRARIES} )
 target_link_libraries(intensity_map_builder ${catkin_LIBRARIES} ${BOOST_LIBRARIES})
 
 add_executable(intensity_map_builder_node src/intensity_map_builder_node.cpp)
-target_link_libraries(intensity_map_builder_node ${catkin_LIBRARIES} ${BOOST_LIBRARIES} intensity_map_lib intensity_map_builder)
+target_link_libraries(intensity_map_builder_node ${catkin_LIBRARIES} ${BOOST_LIBRARIES} intensity_map_handler intensity_map_builder)
 
 
 install(DIRECTORY param/
@@ -44,16 +44,16 @@ install(DIRECTORY include/intensity_map_lib/
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
 
-#catkin_install_python(PROGRAMS scripts/show_map.py
-#                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+catkin_install_python(PROGRAMS scripts/show_map.py
+                     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
-install(DIRECTORY include/intensity_map_lib/ include/intensity_map_builder/
+install(DIRECTORY include/intensity_map_handler/ include/intensity_map_builder/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
 
-install(TARGETS intensity_map_builder_node intensity_map_lib intensity_map_builder
+install(TARGETS intensity_map_builder_node intensity_map_handler intensity_map_builder
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

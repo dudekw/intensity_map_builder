@@ -15,7 +15,7 @@ def talker(file_name):
     my_marker = Marker()
     my_marker.header.seq = 0
     my_marker.header.stamp = rospy.Time.now()
-    my_marker.header.frame_id = "odom"
+    my_marker.header.frame_id = "map"
 
     my_marker.ns = "show_map"
     my_marker.id = 1
