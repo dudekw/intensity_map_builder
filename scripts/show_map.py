@@ -8,7 +8,7 @@ import string
 import sys
 
 def talker(file_name):
-    pub = rospy.Publisher('visualization_marker', Marker, queue_size=100)
+    pub = rospy.Publisher('visualization_marker_map', Marker, queue_size=100)
     rospy.init_node('show_map', anonymous=True)
     root = xml.etree.ElementTree.parse(file_name).getroot()
 

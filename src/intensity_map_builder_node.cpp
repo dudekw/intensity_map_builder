@@ -4,6 +4,7 @@
 #include <intensity_map_msgs/SaveMap.h>
 #include <iostream>
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 tf::StampedTransform tf_transform;
@@ -11,16 +12,33 @@ std::auto_ptr<IntensityMapBuilder> intensity_map_builder;
 std::auto_ptr<IntensityMapHandler> intensity_map_handler;
 std::auto_ptr<tf::TransformListener> listener_ptr;
 visualization_msgs::MarkerArray vis_marker_array;
+std::string fixed_frame;
+std::string robot_frame;
+bool updated_map;
 void updateMapMarkers(const intensity_map_msgs::IntensityMarker& markers_msg)
 {
+    updated_map = false;
+fixed_frame = "map";
+robot_frame = "base_link";
     std::cout << "in update: \n";
-
-  listener_ptr->waitForTransform("map", "base_link",
-                                 markers_msg.header.stamp, ros::Duration(10.0));
-  listener_ptr->lookupTransform("map", "base_link",
-                           markers_msg.header.stamp, tf_transform);
-
-  intensity_map_builder->updateMapMarkers(markers_msg, tf_transform);
+   // do
+  //  {
+      if (listener_ptr->canTransform(fixed_frame, robot_frame,
+                                     markers_msg.header.stamp))
+      {
+          std::cout << "WILL lookupTransform \n";
+      
+          listener_ptr->lookupTransform("map", "base_link",
+                                   markers_msg.header.stamp, tf_transform);
+          intensity_map_builder->updateMapMarkers(markers_msg, tf_transform);  
+          updated_map = true;
+      }
+      else
+      {
+        ROS_WARN_STREAM("Can't find transform from ["<<fixed_frame<<"] to ["<<robot_frame<<"] in markers time ["<<markers_msg.header.stamp<<"].\n Skipping intensity map update!!!!");
+      }
+   // }
+  //  while(!updated_map);
 }
 
 bool save_current_map(intensity_map_msgs::SaveMap::Request  &req,
